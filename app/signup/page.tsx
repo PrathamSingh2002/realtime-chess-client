@@ -15,7 +15,6 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { processEnv } from "@next/env"
 const formSchemaSignup = z.object({
     name: z.string().min(3, {
       message: "Enter a valid name.",
@@ -29,8 +28,8 @@ const formSchemaSignup = z.object({
       message: "Username must be at most 16 characters."}
     )
   })
+import { base_url } from "../utils/socket"
 export default function Signup(){
-    const base_url = 'http://localhost:5000';
     const formSignup = useForm<z.infer<typeof formSchemaSignup>>({
         resolver: zodResolver(formSchemaSignup),
       })

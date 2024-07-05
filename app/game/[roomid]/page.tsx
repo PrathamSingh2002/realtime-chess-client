@@ -2,14 +2,11 @@
 import { useEffect, useState } from "react";
 import { Chess } from 'chess.js'
 import { Chessboard } from 'react-chessboard'
-import socket from "@/app/utils/socket";
+import socket, { base_url } from "@/app/utils/socket";
 import { useStore } from "@/app/stores/store"; 
 import axios from "axios";
 
-
-
 export default function GameRoom({ params }: { params: { roomid: string } }) {
-    const base_url = 'http://localhost:5000';
     const [game] = useState(new Chess());
     const {user, gameType, setUser, setGameType} = useStore();
     const [isGameOver, setIsGameOver] = useState(false);

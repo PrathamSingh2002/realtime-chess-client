@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-
+import { base_url } from "../utils/socket"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -31,7 +31,6 @@ const formSchemaLogin = z.object({
 
 
 export default function Login() {
-  const base_url = 'http://localhost:5000';
   const {setUser}  = useStore()  
   // 1. Define your form.
   const formLogin = useForm<z.infer<typeof formSchemaLogin>>({

@@ -2,11 +2,9 @@
 import { useEffect, useState } from 'react';
 import { useStore } from './stores/store';
 import { useRouter } from 'next/navigation';
-import socket from './utils/socket';
+import socket, { base_url } from './utils/socket';
 import axios from 'axios';
-
 const Home = () => {
-    const base_url = 'http://localhost:5000';
     const [selectedTab, setSelectedTab] = useState(1);
     const { user, setUser, setGameType } = useStore()
     const [topPlayers, setTopPlayers] = useState([])
