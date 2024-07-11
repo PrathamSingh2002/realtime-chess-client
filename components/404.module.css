@@ -1,0 +1,59 @@
+.errorContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+  }
+  
+  .chessboard {
+    width: 200px;
+    height: 200px;
+    background-image: 
+      linear-gradient(45deg, #b58863 25%, transparent 25%),
+      linear-gradient(-45deg, #b58863 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #b58863 75%),
+      linear-gradient(-45deg, transparent 75%, #b58863 75%);
+    background-size: 50px 50px;
+    background-position: 0 0, 0 25px, 25px -25px, -25px 0px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+  }
+  
+  .piece {
+    font-size: 100px;
+    color: #f0d9b5;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .errorTitle {
+    font-size: 72px;
+    color: #333;
+    margin: 0;
+  }
+  
+  .errorMessage {
+    font-size: 24px;
+    color: #666;
+    margin: 10px 0 30px;
+  }
+  
+  .homeLink {
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 18px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .homeLink:hover {
+    background-color: #2980b9;
+  }

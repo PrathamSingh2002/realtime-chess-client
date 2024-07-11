@@ -26,9 +26,11 @@ export default function RootLayout({
                   <Link href="/profile" className="text-gray-300 hover:text-white transition duration-150 ease-in-out">
                     Profile
                   </Link>
-                  <button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-sm font-medium transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    Login
-                  </button>
+                  <Link href='/login'>
+                    <button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-sm font-medium transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Login
+                    </button>
+                  </Link>
                 </div>
               </div>
             </div>

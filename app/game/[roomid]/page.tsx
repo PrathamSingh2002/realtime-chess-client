@@ -5,8 +5,10 @@ import { Chessboard } from 'react-chessboard'
 import socket, { base_url } from "@/app/utils/socket";
 import { useStore } from "@/app/stores/store"; 
 import axios from "axios";
+import withAuth from "@/app/auth/userauthmiddleware";
+import withGameAuth from "@/app/auth/gameauthmiddleware";
 
-export default function GameRoom({ params }: { params: { roomid: string } }) {
+function GameRoom({ params }: { params: { roomid: string } }) {
     const [game] = useState(new Chess());
     const {user, gameType, setUser, setGameType} = useStore();
     const [isGameOver, setIsGameOver] = useState(false);
@@ -25,7 +27,6 @@ export default function GameRoom({ params }: { params: { roomid: string } }) {
         socket.on('gameOver', (obj: any, delta: number) => {
             setGameType(obj);
             setIsGameOver(true);
-            console.log(obj)
             let message = '';
             if (obj.gameOver === 'win') {
                 message = `${obj.whiteName} wins!`;
@@ -40,24 +41,7 @@ export default function GameRoom({ params }: { params: { roomid: string } }) {
                 blackRatingChange: -delta
             });
         })
-        reload()
-
-        return () => {
-            socket.off('updateScreen');
-            socket.off('gameOver');
-        }
     }, [])
-
-    async function reload() {
-        try {
-            const response = await axios.post(`${base_url}/api/getgamestats`, {id: params.roomid});
-            if(response.data){
-                setGameType(response.data)
-            }
-        } catch (error) {
-            console.log(error)
-        }
-    }
 
     function movePiece(source: string, target: string) {
         try {
@@ -140,3 +124,5 @@ export default function GameRoom({ params }: { params: { roomid: string } }) {
         </div>
     );
 }
+
+export default withAuth(withGameAuth(GameRoom));
