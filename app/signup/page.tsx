@@ -3,14 +3,12 @@
 import { useStore } from "../stores/store"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, Controller } from "react-hook-form"
-import { z } from "zod"
+import { z } from 'zod';
 import axios from 'axios'
 import { Button } from "@/components/ui/button"
-import withAuth from "../auth/userauthmiddleware"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,

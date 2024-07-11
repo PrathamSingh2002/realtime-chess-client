@@ -13,6 +13,7 @@ function GameRoom({ params }: { params: { roomid: string } }) {
     const {user, gameType, setUser, setGameType} = useStore();
     const [isGameOver, setIsGameOver] = useState(false);
     const [gameOverData, setGameOverData] = useState({ message: '', whiteRatingChange: 0, blackRatingChange: 0 });
+    const isCurrentPlayerTurn = user?.username === gameType?.whiteName ? game.turn() === 'w' : game.turn() === 'b';
 
     useEffect(() => {
         const res = localStorage.getItem('user')
@@ -21,8 +22,16 @@ function GameRoom({ params }: { params: { roomid: string } }) {
         }
         socket.emit('joinRoom', params.roomid)
         socket.on('updateScreen', (obj: any) => {
-            game.load(obj.game)
-            setGameType(obj)
+            game.load(obj.game);
+            setGameType(obj);
+        })
+        socket.on('aborted', () => {
+            setIsGameOver(true)
+            setGameOverData({ 
+                message:"Aborted due to inactivity", 
+                whiteRatingChange: 0,
+                blackRatingChange: 0
+            });
         })
         socket.on('gameOver', (obj: any, delta: number) => {
             setGameType(obj);
@@ -42,7 +51,17 @@ function GameRoom({ params }: { params: { roomid: string } }) {
             });
         })
     }, [])
-
+    function formatTime(seconds:number) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = Math.floor(seconds % 60);
+        return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    }
+    function handlePieceDrop(source:string, target:string) {
+        if (!isCurrentPlayerTurn || isGameOver) {
+            return false;
+        }
+        return movePiece(source, target);
+    }
     function movePiece(source: string, target: string) {
         try {
             let move = game.move({
@@ -64,64 +83,99 @@ function GameRoom({ params }: { params: { roomid: string } }) {
         }
     }  
 
-    const isCurrentPlayerTurn = user?.username === gameType?.whiteName ? game.turn() === 'w' : game.turn() === 'b';
 
     return (
-        <div className="w-full flex justify-center items-center min-h-screen bg-gray-100">
-            <div className="bg-white p-8 rounded-lg shadow-lg">
-                <div className="mb-4 text-right">
-                    <div className="text-xl font-bold">{user?.username === gameType?.whiteName ? gameType?.blackName : gameType?.whiteName}</div>
-                    <div className="text-sm text-gray-600">Rating: {user?.username === gameType?.whiteName ? gameType?.blackRating : gameType?.whiteRating}</div>
-                    {
-                    gameType &&
-                    <div className={`text-lg font-semibold ${!isCurrentPlayerTurn ? 'text-red-500' : 'text-gray-700'}`}>
-                    {user?.username === gameType?.whiteName ? gameType.blackTimer/10 : gameType.whiteTimer/10}s
-                    </div>
-                    }
-                </div>
-                <div className="size-[400px] mb-4">
-                    <Chessboard 
-                        boardOrientation={user?.username === gameType?.whiteName ? 'white' : 'black'}
-                        position={gameType?.game}
-                        onPieceDrop={movePiece}
-                    />
-                </div>
-                <div className="mt-4">
-                    <div className="text-xl font-bold">{user?.username}</div>
-                    <div className="text-sm text-gray-600">Rating: {user?.username === gameType?.whiteName ? gameType?.whiteRating : gameType?.blackRating}</div>
-                    {
-                        gameType &&
-                    <div className={`text-lg font-semibold ${isCurrentPlayerTurn ? 'text-red-500' : 'text-gray-700'}`}>
-                        {user?.username === gameType?.whiteName ? gameType?.whiteTimer/10 : gameType?.blackTimer/10}s
-                    </div>
-                    }
-                </div>
+        <div className="w-full min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex justify-center items-center p-4">
+    <div className="bg-white rounded-xl shadow-2xl overflow-hidden max-w-md w-full">
+        <div className="bg-gray-800 text-white p-4 flex justify-between items-center">
+            <div className="text-left">
+                <div className="text-xl font-bold">{user?.username === gameType?.whiteName ? gameType?.blackName : gameType?.whiteName}</div>
+                <div className="text-sm text-gray-400">Rating: {user?.username === gameType?.whiteName ? gameType?.blackRating : gameType?.whiteRating}</div>
             </div>
-
-            {isGameOver && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-                    <div className="bg-white p-8 rounded-lg shadow-lg text-center max-w-md w-full">
-                        <h2 className="text-3xl font-bold mb-4 text-gray-800">Game Over</h2>
-                        <p className="text-xl mb-6 text-gray-700">{gameOverData.message}</p>
-                        <div className="mb-6">
-                            <p className="text-lg font-semibold">Rating Changes:</p>
-                            <p className={`text-lg ${gameOverData.whiteRatingChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                {gameType?.whiteName}: {gameOverData.whiteRatingChange > 0 ? '+' : ''}{gameOverData.whiteRatingChange}
-                            </p>
-                            <p className={`text-lg ${gameOverData.blackRatingChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                {gameType?.blackName}: {gameOverData.blackRatingChange > 0 ? '+' : ''}{gameOverData.blackRatingChange}
-                            </p>
-                        </div>
-                        <button 
-                            className="mt-4 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-                            onClick={() => setIsGameOver(false)}
-                        >
-                            Close
-                        </button>
-                    </div>
+            {gameType && (
+                <div className={`text-2xl font-bold ${!isCurrentPlayerTurn ? 'text-red-500' : 'text-green-500'}`}>
+                    {formatTime(user?.username === gameType?.whiteName ? gameType.blackTimer/2 : gameType.whiteTimer/2)}
                 </div>
             )}
         </div>
+        
+        <div className="p-4">
+            <div className="aspect-square w-full mb-4">
+                <Chessboard 
+                    boardOrientation={user?.username === gameType?.whiteName ? 'white' : 'black'}
+                    position={gameType?.game}
+                    onPieceDrop={handlePieceDrop}
+                    customBoardStyle={{
+                        borderRadius: '0.5rem',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                    }}
+                />
+            </div>
+        </div>
+
+        <div className="bg-gray-800 text-white p-4 flex justify-between items-center">
+            <div className="text-left">
+                <div className="text-xl font-bold">{user?.username}</div>
+                <div className="text-sm text-gray-400">Rating: {user?.username === gameType?.whiteName ? gameType?.whiteRating : gameType?.blackRating}</div>
+            </div>
+            {gameType && (
+                <div className={`text-2xl font-bold ${isCurrentPlayerTurn ? 'text-red-500' : 'text-green-500'}`}>
+                    {formatTime(user?.username === gameType?.whiteName ? gameType?.whiteTimer/2 : gameType?.blackTimer/2)}
+                </div>
+            )}
+        </div>
+
+        <div className="p-4 flex justify-center space-x-4">
+            <button 
+                className={`bg-red-500 text-white font-bold py-2 px-4 rounded-full transition duration-300 ease-in-out transform hover:scale-105 ${isGameOver ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-600'}`}
+                disabled={isGameOver}
+            >
+                Resign
+            </button>
+            <button 
+                className={`bg-blue-500 text-white font-bold py-2 px-4 rounded-full transition duration-300 ease-in-out transform hover:scale-105 ${isGameOver ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'}`}
+                disabled={isGameOver}
+            >
+                Offer Draw
+            </button>
+        </div>
+    </div>
+
+    {isGameOver && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4">
+            <div className="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full">
+                <h2 className="text-3xl font-bold mb-4 text-gray-800">Game Over</h2>
+                <p className="text-xl mb-6 text-gray-700">{gameOverData.message}</p>
+                <div className="mb-6">
+                    <p className="text-lg font-semibold mb-2">Rating Changes:</p>
+                    <p className={`text-lg ${gameOverData.whiteRatingChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {gameType?.whiteName}: {gameOverData.whiteRatingChange > 0 ? '+' : ''}{gameOverData.whiteRatingChange}
+                    </p>
+                    <p className={`text-lg ${gameOverData.blackRatingChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {gameType?.blackName}: {gameOverData.blackRatingChange > 0 ? '+' : ''}{gameOverData.blackRatingChange}
+                    </p>
+                </div>
+                <div className="flex space-x-4">
+                    <button 
+                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                        onClick={() => setIsGameOver(false)}
+                    >
+                        Close
+                    </button>
+                    <button 
+                        className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+                        onClick={() => {
+                            // Add your logic to navigate to home page
+                            // For example: router.push('/home')
+                        }}
+                    >
+                        Go to Home
+                    </button>
+                </div>
+            </div>
+        </div>
+    )}
+</div>
     );
 }
 
