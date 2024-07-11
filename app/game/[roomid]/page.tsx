@@ -12,6 +12,7 @@ function GameRoom({ params }: { params: { roomid: string } }) {
     const [game] = useState(new Chess());
     const {user, gameType, setUser, setGameType} = useStore();
     const [isGameOver, setIsGameOver] = useState(false);
+    const [gameOverPopup, setGameOverPopup] = useState(false);
     const [gameOverData, setGameOverData] = useState({ message: '', whiteRatingChange: 0, blackRatingChange: 0 });
     const isCurrentPlayerTurn = user?.username === gameType?.whiteName ? game.turn() === 'w' : game.turn() === 'b';
 
@@ -26,7 +27,8 @@ function GameRoom({ params }: { params: { roomid: string } }) {
             setGameType(obj);
         })
         socket.on('aborted', () => {
-            setIsGameOver(true)
+            setIsGameOver(true);
+            setGameOverPopup(true);
             setGameOverData({ 
                 message:"Aborted due to inactivity", 
                 whiteRatingChange: 0,
@@ -36,6 +38,7 @@ function GameRoom({ params }: { params: { roomid: string } }) {
         socket.on('gameOver', (obj: any, delta: number) => {
             setGameType(obj);
             setIsGameOver(true);
+            setGameOverPopup(true);
             let message = '';
             if (obj.gameOver === 'win') {
                 message = `${obj.whiteName} wins!`;
@@ -82,8 +85,9 @@ function GameRoom({ params }: { params: { roomid: string } }) {
             return false
         }
     }  
-
-
+    function handleResign(){
+        socket.emit('resign', params.roomid, user?.username);
+    }
     return (
         <div className="w-full min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex justify-center items-center p-4">
     <div className="bg-white rounded-xl shadow-2xl overflow-hidden max-w-md w-full">
@@ -129,19 +133,14 @@ function GameRoom({ params }: { params: { roomid: string } }) {
             <button 
                 className={`bg-red-500 text-white font-bold py-2 px-4 rounded-full transition duration-300 ease-in-out transform hover:scale-105 ${isGameOver ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-600'}`}
                 disabled={isGameOver}
+                onClick={handleResign}
             >
                 Resign
-            </button>
-            <button 
-                className={`bg-blue-500 text-white font-bold py-2 px-4 rounded-full transition duration-300 ease-in-out transform hover:scale-105 ${isGameOver ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'}`}
-                disabled={isGameOver}
-            >
-                Offer Draw
             </button>
         </div>
     </div>
 
-    {isGameOver && (
+    {isGameOver && gameOverPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4">
             <div className="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full">
                 <h2 className="text-3xl font-bold mb-4 text-gray-800">Game Over</h2>
@@ -158,7 +157,7 @@ function GameRoom({ params }: { params: { roomid: string } }) {
                 <div className="flex space-x-4">
                     <button 
                         className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-                        onClick={() => setIsGameOver(false)}
+                        onClick={() => setGameOverPopup(false)}
                     >
                         Close
                     </button>
