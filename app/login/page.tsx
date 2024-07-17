@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm, Controller } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { jwtDecode } from "jwt-decode"
 import { z } from "zod"
 import { base_url } from "../utils/socket"
@@ -20,6 +20,7 @@ import Link from "next/link"
 import axios from "axios"
 import { useStore } from "../stores/store"
 import { useRouter } from "next/navigation"
+import { FaChess } from 'react-icons/fa'
 
 const formSchemaLogin = z.object({
   username: z.string().min(2, {
@@ -51,7 +52,6 @@ export default function Login() {
         window.localStorage.setItem('token', JSON.stringify(response.data))
         const obj = jwtDecode(response.data);
         window.localStorage.setItem('user', JSON.stringify(obj))
-        console.log(obj)
         router.push('dashboard')
       }
     } catch (error) {
@@ -60,17 +60,20 @@ export default function Login() {
   }
  
   return (
-    <div className="flex items-start  justify-center min-h-screen bg-gray-100">
-      <Card className="w-[350px]">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-4">
+      <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Login</CardTitle>
-          <CardDescription className="text-center">
-            Enter your credentials to access your account
+          <div className="flex justify-center mb-4">
+            <FaChess className="text-5xl text-indigo-600" />
+          </div>
+          <CardTitle className="text-3xl font-bold text-center">Welcome back</CardTitle>
+          <CardDescription className="text-center text-lg">
+            Sign in to your Chesslive account
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...formLogin}>
-            <form onSubmit={formLogin.handleSubmit(onSubmitLogin)} className="space-y-4">
+            <form onSubmit={formLogin.handleSubmit(onSubmitLogin)} className="space-y-6">
               <FormField
                 control={formLogin.control}
                 name="username"
@@ -78,13 +81,7 @@ export default function Login() {
                   <FormItem>
                     <FormLabel>Username</FormLabel>
                     <FormControl>
-                      <Controller
-                        name="username"
-                        control={formLogin.control}
-                        render={({ field }) => (
-                          <Input placeholder="Enter your username" {...field} />
-                        )}
-                      />
+                      <Input placeholder="Enter your username" {...field} className="bg-gray-50" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -97,39 +94,27 @@ export default function Login() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Controller
-                        name="password"
-                        control={formLogin.control}
-                        render={({ field }) => (
-                          <Input type="password" placeholder="Enter your password" {...field} />
-                        )}
-                      />
+                      <Input type="password" placeholder="Enter your password" {...field} className="bg-gray-50" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700">
                 Sign In
               </Button>
             </form>
           </Form>
-          <div className="mt-4 text-center text-sm">
-            {/* <Link href="/forgot-password" className="text-blue-500 hover:underline">
-              Forgot password?
-            </Link> */}
-          </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
             </div>
-            
           </div>
           <p className="text-center text-sm text-gray-600">
             Don't have an account?{" "}
-            <Link href="/signup" className="text-blue-500 hover:underline">
+            <Link href="/signup" className="text-indigo-600 hover:underline font-medium">
               Sign up
             </Link>
           </p>

@@ -19,6 +19,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import Link from "next/link"
 import { base_url } from "../utils/socket"
 import { useRouter } from 'next/navigation'
+import { FaChess } from 'react-icons/fa'
 
 const formSchemaSignup = z.object({
     name: z.string().min(3, {
@@ -63,17 +64,20 @@ function Signup(){
     }
     
     return(
-        <div className="flex items-start justify-center min-h-screen bg-gray-100">
-          <Card className="w-[400px]">
+        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-4">
+          <Card className="w-full max-w-md">
             <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl font-bold text-center">Create an account</CardTitle>
-              <CardDescription className="text-center">
-                Enter your details to sign up for a new account
+              <div className="flex justify-center mb-4">
+                <FaChess className="text-5xl text-indigo-600" />
+              </div>
+              <CardTitle className="text-3xl font-bold text-center">Create an account</CardTitle>
+              <CardDescription className="text-center text-lg">
+                Join Chesslive and start playing today
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Form {...formSignup}>
-                <form onSubmit={formSignup.handleSubmit(onSubmitSignup)} className="space-y-4">
+                <form onSubmit={formSignup.handleSubmit(onSubmitSignup)} className="space-y-6">
                   <FormField
                     control={formSignup.control}
                     name="name"
@@ -81,13 +85,7 @@ function Signup(){
                       <FormItem>
                         <FormLabel>Name</FormLabel>
                         <FormControl>
-                          <Controller
-                            name="name"
-                            control={formSignup.control}
-                            render={({ field }) => (
-                              <Input placeholder="Enter your full name" {...field} />
-                            )}
-                          />
+                          <Input placeholder="Enter your full name" {...field} className="bg-gray-50" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -100,13 +98,7 @@ function Signup(){
                       <FormItem>
                         <FormLabel>Username</FormLabel>
                         <FormControl>
-                          <Controller
-                            name="username"
-                            control={formSignup.control}
-                            render={({ field }) => (
-                              <Input placeholder="Choose a username" {...field} />
-                            )}
-                          />
+                          <Input placeholder="Choose a username" {...field} className="bg-gray-50" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -119,19 +111,13 @@ function Signup(){
                       <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                          <Controller
-                            name="password"
-                            control={formSignup.control}
-                            render={({ field }) => (
-                              <Input type="password" placeholder="Create a strong password" {...field} />
-                            )}
-                          />
+                          <Input type="password" placeholder="Create a strong password" {...field} className="bg-gray-50" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" className="w-full">Sign Up</Button>
+                  <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700">Sign Up</Button>
                 </form>
               </Form>
             </CardContent>
@@ -143,7 +129,7 @@ function Signup(){
               </div>
               <p className="text-center text-sm text-gray-600">
                 Already have an account?{" "}
-                <Link href="/login" className="text-blue-500 hover:underline">
+                <Link href="/login" className="text-indigo-600 hover:underline font-medium">
                   Sign in
                 </Link>
               </p>
