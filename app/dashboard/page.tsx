@@ -1,3 +1,4 @@
+'use client'
 import { useState, useEffect } from 'react';
 import { useStore } from '../stores/store';
 import { useRouter } from 'next/navigation' // Changed from 'next/navigation' to 'next/router'
