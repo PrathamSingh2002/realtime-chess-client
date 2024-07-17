@@ -1,31 +1,46 @@
-"use client"
 import { useState, useEffect } from 'react';
 import { useStore } from '../stores/store';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router'; // Changed from 'next/navigation' to 'next/router'
 import socket, { base_url } from '../utils/socket';
 import axios from 'axios';
 import withAuth from '../auth/userauthmiddleware';
-import { FaChess, FaTrophy, FaUserFriends, FaTimesCircle } from 'react-icons/fa';
+import { FaChess, FaTrophy, FaUserFriends } from 'react-icons/fa';
 
-const Home = () => {
-    const [selectedTab, setSelectedTab] = useState(1);
-    const [enterLobby, setEnterLobby] = useState(false);
-    const [challengeUser, setChallengeUser] = useState('');
-    const [challengePopup, setChallengePopup] = useState(null);
-    const [challengeMessage, setChallengeMessage] = useState('');
+interface User {
+    name:string;
+    username: string;
+    rating: number;
+    games:number;
+    wins:number;
+}
+
+interface ChallengePopup {
+    player1: string;
+    player2: string;
+    variant: number;
+    rating: number;
+}
+
+const Home: React.FC = () => {
+    const [selectedTab, setSelectedTab] = useState<number>(1);
+    const [enterLobby, setEnterLobby] = useState<boolean>(false);
+    const [challengeUser, setChallengeUser] = useState<string>('');
+    const [challengePopup, setChallengePopup] = useState<ChallengePopup | null>(null);
+    const [challengeMessage, setChallengeMessage] = useState<string>('');
     const { user, setUser, setGameType } = useStore();
-    const [topPlayers, setTopPlayers] = useState([]);
+    const [topPlayers, setTopPlayers] = useState<User[]>([]);
     const router = useRouter();
+
     useEffect(() => {
         const data = window.localStorage.getItem('user');
         if (data) {
-            const userObj = JSON.parse(data);
+            const userObj: User = JSON.parse(data);
             socket.on('joined/' + userObj.username, (obj) => {
                 setGameType(obj);
                 router.push("game/" + obj.id);
             });
-            socket.on('challengeSend/' + userObj.username, (player1, variant, rating, player2) => {
-                setChallengePopup({ player1: player1, player2: player2, variant: variant, rating: rating });
+            socket.on('challengeSend/' + userObj.username, (player1: string, variant: number, rating: number, player2: string) => {
+                setChallengePopup({ player1, player2, variant, rating });
             });
             socket.on('challengeRejected/' + userObj.username, () => {
                 setChallengeMessage('Your challenge was rejected.');
@@ -37,7 +52,7 @@ const Home = () => {
         return () => {
             cleanup();
         };
-    }, []);
+    }, [router, setUser, setGameType]);
 
     const cleanup = () => {
         socket.emit("cancelJoin");
@@ -47,8 +62,8 @@ const Home = () => {
         try {
             const data = window.localStorage.getItem('token');
             if (data) {
-                const token = JSON.parse(data);
-                const response = await axios.get(`${base_url}/api/getallusers`, {
+                const token: string = JSON.parse(data);
+                const response = await axios.get<User[]>(`${base_url}/api/getallusers`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     }
@@ -62,12 +77,12 @@ const Home = () => {
         }
     };
 
-    const getUserData = async (id) => {
+    const getUserData = async (id: string) => {
         try {
             const data = window.localStorage.getItem('token');
             if (data) {
-                const token = JSON.parse(data);
-                const response = await axios.post(`${base_url}/api/getuserdata`, { username: id }, {
+                const token: string = JSON.parse(data);
+                const response = await axios.post<string>(`${base_url}/api/getuserdata`, { username: id }, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     }
@@ -97,7 +112,7 @@ const Home = () => {
     };
 
     const handleChallenge = () => {
-        if (challengeUser) {
+        if (challengeUser && user) {
             socket.emit('challengeSend', user.username, selectedTab, user.rating, challengeUser);
             setChallengeMessage(`Challenge sent to ${challengeUser}`);
         }
@@ -109,10 +124,10 @@ const Home = () => {
             rating: user?.rating,
         };
         const p2 = {
-            username: challengePopup.player1,
-            rating: challengePopup.rating,
+            username: challengePopup?.player1,
+            rating: challengePopup?.rating,
         };
-        const variant = challengePopup.variant;
+        const variant = challengePopup?.variant;
         socket.emit('challengeAccept', p1, p2, variant);
         setChallengePopup(null);
     };

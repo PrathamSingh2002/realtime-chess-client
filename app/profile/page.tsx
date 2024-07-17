@@ -88,7 +88,7 @@ const ProfilePage = () => {
     );
 };
 
-const StatCard = ({ icon, title, value }) => (
+const StatCard = ({ icon, title, value }:{icon:any, title:any, value:any}) => (
     <div className="bg-gray-50 rounded-xl p-6 shadow-md transition duration-300 ease-in-out transform hover:scale-105">
         <div className="flex items-center justify-between">
             <div>
