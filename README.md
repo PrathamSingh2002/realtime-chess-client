@@ -31,10 +31,10 @@ RealtimeChess is an online chess platform where players can engage in games with
 
 ## Screenshots
 
-![Home Page](path/to/homepage-screenshot.png)
+![Home Page](path/to/home.png)
 *Caption: Screenshot of the homepage.*
 
-![Game Interface](path/to/game-interface-screenshot.png)
+![Game Interface](path/to/game.png)
 *Caption: Screenshot of the game interface.*
 
 ## Installation
