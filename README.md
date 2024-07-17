@@ -37,6 +37,15 @@ RealtimeChess is an online chess platform where players can engage in games with
 ![Game Interface](to/game.png)
 *Caption: Screenshot of the game interface.*
 
+![Gameover](to/gameover.png)
+*Caption: Screenshot of the gameover screen.*
+
+![Login](to/login.png)
+*Caption: Screenshot of the Login screen.*
+
+![Signup](to/signup.png)
+*Caption: Screenshot of the Singup screen.*
+
 ## Installation
 
 To set up the RealtimeChess Frontend locally, follow these steps:
