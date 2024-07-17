@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useStore } from '../stores/store';
-import { useRouter } from 'next/router'; // Changed from 'next/navigation' to 'next/router'
+import { useRouter } from 'next/navigation' // Changed from 'next/navigation' to 'next/router'
 import socket, { base_url } from '../utils/socket';
 import axios from 'axios';
 import withAuth from '../auth/userauthmiddleware';
