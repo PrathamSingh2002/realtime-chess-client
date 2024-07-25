@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Chess } from 'chess.js'
 import { Chessboard } from 'react-chessboard'
-import socket, { base_url } from "@/app/utils/socket";
+import socket from "@/app/utils/socket";
 import { useStore } from "@/app/stores/store"; 
 import axios from "axios";
 import withAuth from "@/app/auth/userauthmiddleware";

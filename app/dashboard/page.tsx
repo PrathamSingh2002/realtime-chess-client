@@ -113,7 +113,10 @@ const Home: React.FC = () => {
     };
 
     const handleChallenge = () => {
-        if (challengeUser && user) {
+        if(user?.username == challengeUser){
+            setChallengeMessage(`Cannot challenge self`);
+        }
+        else if (challengeUser && user) {
             socket.emit('challengeSend', user.username, selectedTab, user.rating, challengeUser);
             setChallengeMessage(`Challenge sent to ${challengeUser}`);
         }
